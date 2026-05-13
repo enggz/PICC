@@ -1,0 +1,1425 @@
+---
+title: "Pemodelan Determinan IPM"
+output:
+  flexdashboard::flex_dashboard:
+    vertical_layout: scroll
+    theme: yeti
+---
+
+```{r, echo=FALSE, results="asis"}
+htmltools::HTML('<link rel="stylesheet" href="assets/styles.css">')
+```
+
+
+```{r setup, include=FALSE}
+packages <- c(
+  "flexdashboard",
+  "tidyverse",
+  "highcharter",
+  "viridis",
+  "DT",
+  "gapminder",
+  "jsonlite",
+  "plm",
+  "dplyr",
+  "tidyr",
+  "purrr",
+  "htmltools",
+  "GGally",
+  "broom"
+)
+
+installed <- packages %in% rownames(installed.packages())
+if (any(!installed)) {
+  install.packages(packages[!installed])
+}
+
+# Load library
+library(flexdashboard)
+library(tidyverse)
+library(highcharter)
+library(viridis)
+library(DT)
+library(gapminder)
+library(jsonlite)
+library(plm)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(htmltools)
+library(GGally)
+library(broom)
+```
+
+Members {data-orientation=rows}
+=======================================================================
+
+### Rafael
+
+```{=html}
+<div class="profile-container">
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="profile-photo-container">
+        <img src="https://raw.githubusercontent.com/enggz/FinalEx/main/pael.jpg" alt="Rafael Yogi Septiadi Putra" class="profile-photo">
+        <div class="profile-badge">
+          <i class="fas fa-star"></i>
+        </div>
+      </div>
+      <div class="profile-titles">
+        <h1>RAFAEL YOGI SEPTIADI P.</h1>
+        <p class="role">Data Science Major</p>
+        <div class="university-badge">
+          <i class="fas fa-university"></i>
+          <a href="https://itsb.ac.id/" target="_blank" style="color: inherit; text-decoration: none;">
+            Institut Teknologi Sains Bandung
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="profile-details">
+      <div class="detail-section">
+        <div class="detail-item">
+          <div class="detail-icon">
+            <img src="https://raw.githubusercontent.com/enggz/FinalEx/main/dslog.png" alt="Data Science" style="width: 20px; height: 20px; object-fit: contain;">
+          </div>
+          <div class="detail-content">
+            <span class="label">Major</span>
+            <span class="value">Data Science</span>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-icon">
+            <img src="https://raw.githubusercontent.com/enggz/FinalEx/main/Logo ITSB.png" alt="Data Science" style="width: 20px; height: 20px; object-fit: contain;">
+          </div>
+          <div class="detail-content">
+            <span class="label">Student ID</span>
+            <span class="value">52250019</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="detail-section">
+        <div class="detail-item">
+          <div class="detail-icon">
+            <img src="https://raw.githubusercontent.com/enggz/FinalEx/main/mrb.jpg" alt="Data Science" style="width: 20px; height: 20px; object-fit: contain;">
+          </div>
+          <div class="detail-content">
+            <span class="label">Lecturer</span>
+            <span class="value">Bakti Siregar, M. Sc., CSD.</span>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-icon">
+            <i class="fas fa-book"></i>
+          </div>
+          <div class="detail-content">
+            <span class="label">Subject</span>
+            <span class="value">Pekan Analisis Statistika</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="profile-footer">
+      <div class="profile-tags">
+        <a href="https://rpubs.com/Eng" class="tag rpubs-tag" target="_blank">
+          <i class="fab fa-r-project"></i> Rpubs
+        </a>
+        <a href="https://itsb.ac.id/study-program/sains-data" class="tag" target="_blank" style="text-decoration: none;">
+          <i class="fas fa-database"></i> Data Science
+        </a>
+        <span class="tag">
+          <i class="fas fa-chart-bar"></i> Statistics
+        </span>
+      </div>
+      <div class="contact-info">
+        <a href="https://github.com/enggz" class="social-icon" target="_blank"><img src="https://raw.githubusercontent.com/enggz/FinalEx/main/github.png" alt="GitHub" style="width: 20px; height: 20px; object-fit: contain;"></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Profile Card Container */
+.profile-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+  perspective: 600px;
+  max-height: 700px;
+}
+/* Profile Card Styles */
+.profile-card {
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+  padding: 2.5rem;
+  max-height: 100%;
+  width: 100%;
+  max-width: 700px;
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  animation: cardEntrance 0.8s ease-out;
+}
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.profile-photo-container {
+  position: relative;
+  margin-right: 1.5rem;
+}
+.profile-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 15px;
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+.profile-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: linear-gradient(45deg, #4e54c8, #8f94fb);
+  color: white;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7em;
+  box-shadow: 0 2px 5px rgba(78, 84, 200, 0.3);
+}
+.profile-titles h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3em;
+  color: #2c3e50;
+  font-weight: 700;
+}
+.role {
+  margin: 0 0 0.5rem 0;
+  color: #6c757d;
+  font-size: 0.9em;
+}
+.university-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(78, 84, 200, 0.1);
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  font-size: 0.8em;
+  color: #4e54c8;
+}
+.profile-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.detail-section {
+  background: rgba(255, 255, 255, 0.6);
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+.detail-item {
+  display: flex;
+  margin-bottom: 0.8rem;
+  align-items: center;
+}
+.detail-icon {
+  width: 30px;
+  height: 30px;
+  background: rgba(78, 84, 200, 0.1);
+  color: #4e54c8;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.8rem;
+  font-size: 0.9em;
+}
+.detail-content .label {
+  display: block;
+  font-size: 0.7em;
+  color: #6c757d;
+  font-weight: 500;
+}
+.detail-content .value {
+  font-size: 0.9em;
+  color: #2c3e50;
+  font-weight: 600;
+}
+.profile-footer {
+  position: relative;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.profile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.8em;
+  background: rgba(0, 0, 0, 0.03);
+  color: #4e54c8;
+  text-decoration: none;
+  border: 1px solid rgba(78, 84, 200, 0.2);
+  transition: all 0.3s ease;
+}
+.tag:hover {
+  background: #4e54c8;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(78, 84, 200, 0.2);
+}
+.contact-info {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.social-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.03);
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+.social-icon:hover {
+  background: #4e54c8;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(78, 84, 200, 0.2);
+}
+/* Animations */
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px) rotateX(-10deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+}
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .profile-photo-container {
+    margin: 0 auto 1rem;
+  }
+  
+  .profile-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .contact-info {
+    margin-top: 1rem;
+    justify-content: flex-end;
+  }
+}
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .profile-card {
+    background: linear-gradient(145deg, #2d3748, #1a202c);
+    color: #e2e8f0;
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+  
+  .profile-titles h1 {
+    color: #f7fafc;
+  }
+  
+  .role {
+    color: #a0aec0;
+  }
+  
+  .detail-content .value {
+    color: #e2e8f0;
+  }
+  
+  .detail-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+  
+  .tag {
+    background: rgba(255, 255, 255, 0.05);
+    color: #a0aec0;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .social-icon {
+    background: rgba(255, 255, 255, 0.05);
+    color: #a0aec0;
+  }
+  
+  .social-icon:hover {
+    background: #4e54c8;
+    color: white;
+  }
+}
+</style>
+```
+
+  
+  
+### Cahaya
+
+```{=html}
+<div class="profile-container">
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="profile-photo-container">
+        <img src="https://raw.githubusercontent.com/enggz/PICC/main/cahaya.jpg" alt="Cahaya Medina Semidang" class="profile-photo">
+        <div class="profile-badge">
+          <i class="fas fa-star"></i>
+        </div>
+      </div>
+      <div class="profile-titles">
+        <h1>CAHAYA MEDINA SEMIDANG</h1>
+        <p class="role">Data Science Major</p>
+        <div class="university-badge">
+          <i class="fas fa-university"></i>
+          <a href="https://itsb.ac.id/" target="_blank" style="color: inherit; text-decoration: none;">
+            Institut Teknologi Sains Bandung
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="profile-details">
+      <div class="detail-section">
+        <div class="detail-item">
+          <div class="detail-icon">
+            <img src="https://raw.githubusercontent.com/enggz/FinalEx/main/dslog.png" alt="Data Science" style="width: 20px; height: 20px; object-fit: contain;">
+          </div>
+          <div class="detail-content">
+            <span class="label">Major</span>
+            <span class="value">Data Science</span>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-icon">
+            <img src="https://raw.githubusercontent.com/enggz/FinalEx/main/Logo ITSB.png" alt="Data Science" style="width: 20px; height: 20px; object-fit: contain;">
+          </div>
+          <div class="detail-content">
+            <span class="label">Student ID</span>
+            <span class="value">52250019</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="detail-section">
+        <div class="detail-item">
+          <div class="detail-icon">
+            <img src="https://raw.githubusercontent.com/enggz/FinalEx/main/mrb.jpg" alt="Data Science" style="width: 20px; height: 20px; object-fit: contain;">
+          </div>
+          <div class="detail-content">
+            <span class="label">Lecturer</span>
+            <span class="value">Bakti Siregar, M. Sc., CSD.</span>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-icon">
+            <i class="fas fa-book"></i>
+          </div>
+          <div class="detail-content">
+            <span class="label">Subject</span>
+            <span class="value">Pekan Analisis Statistika</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="profile-footer">
+      <div class="profile-tags">
+        <a href="https://rpubs.com/cahaya23" class="tag rpubs-tag" target="_blank">
+          <i class="fab fa-r-project"></i> Rpubs
+        </a>
+        <a href="https://itsb.ac.id/study-program/sains-data" class="tag" target="_blank" style="text-decoration: none;">
+          <i class="fas fa-database"></i> Data Science
+        </a>
+        <span class="tag">
+          <i class="fas fa-chart-bar"></i> Statistics
+        </span>
+      </div>
+      <div class="contact-info">
+        <a href="https://github.com/cahayasemidang-max" class="social-icon" target="_blank"><img src="https://raw.githubusercontent.com/enggz/FinalEx/main/github.png" alt="GitHub" style="width: 20px; height: 20px; object-fit: contain;"></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Profile Card Container */
+.profile-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+  perspective: 600px;
+  max-height: 700px;
+}
+/* Profile Card Styles */
+.profile-card {
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+  padding: 2.5rem;
+  max-height: 100%;
+  width: 100%;
+  max-width: 700px;
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  animation: cardEntrance 0.8s ease-out;
+}
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.profile-photo-container {
+  position: relative;
+  margin-right: 1.5rem;
+}
+.profile-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 15px;
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+.profile-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: linear-gradient(45deg, #4e54c8, #8f94fb);
+  color: white;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7em;
+  box-shadow: 0 2px 5px rgba(78, 84, 200, 0.3);
+}
+.profile-titles h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3em;
+  color: #2c3e50;
+  font-weight: 700;
+}
+.role {
+  margin: 0 0 0.5rem 0;
+  color: #6c757d;
+  font-size: 0.9em;
+}
+.university-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(78, 84, 200, 0.1);
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  font-size: 0.8em;
+  color: #4e54c8;
+}
+.profile-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.detail-section {
+  background: rgba(255, 255, 255, 0.6);
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+.detail-item {
+  display: flex;
+  margin-bottom: 0.8rem;
+  align-items: center;
+}
+.detail-icon {
+  width: 30px;
+  height: 30px;
+  background: rgba(78, 84, 200, 0.1);
+  color: #4e54c8;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.8rem;
+  font-size: 0.9em;
+}
+.detail-content .label {
+  display: block;
+  font-size: 0.7em;
+  color: #6c757d;
+  font-weight: 500;
+}
+.detail-content .value {
+  font-size: 0.9em;
+  color: #2c3e50;
+  font-weight: 600;
+}
+.profile-footer {
+  position: relative;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.profile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.8em;
+  background: rgba(0, 0, 0, 0.03);
+  color: #4e54c8;
+  text-decoration: none;
+  border: 1px solid rgba(78, 84, 200, 0.2);
+  transition: all 0.3s ease;
+}
+.tag:hover {
+  background: #4e54c8;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(78, 84, 200, 0.2);
+}
+.contact-info {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.social-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.03);
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+.social-icon:hover {
+  background: #4e54c8;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(78, 84, 200, 0.2);
+}
+/* Animations */
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px) rotateX(-10deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+}
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .profile-photo-container {
+    margin: 0 auto 1rem;
+  }
+  
+  .profile-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .contact-info {
+    margin-top: 1rem;
+    justify-content: flex-end;
+  }
+}
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .profile-card {
+    background: linear-gradient(145deg, #2d3748, #1a202c);
+    color: #e2e8f0;
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+  
+  .profile-titles h1 {
+    color: #f7fafc;
+  }
+  
+  .role {
+    color: #a0aec0;
+  }
+  
+  .detail-content .value {
+    color: #e2e8f0;
+  }
+  
+  .detail-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+  
+  .tag {
+    background: rgba(255, 255, 255, 0.05);
+    color: #a0aec0;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .social-icon {
+    background: rgba(255, 255, 255, 0.05);
+    color: #a0aec0;
+  }
+  
+  .social-icon:hover {
+    background: #4e54c8;
+    color: white;
+  }
+}
+</style>
+```
+
+Data {data-orientation=rows}
+=======================================================================
+## Column {.tabset .tabset-fade data-height=520}
+-----------------------------------------------------------------------
+
+### Dataset
+
+```{r message=FALSE, warning=FALSE}
+# Pemanggilan data mentah dengan penanganan kolom duplikat
+df_raw <- readr::read_csv(
+  "https://raw.githubusercontent.com/enggz/PICC/refs/heads/main/PAS_JAMBORE.csv",
+  skip = 1, 
+  show_col_types = FALSE
+) 
+
+# Memberikan Nama Kolom yang Unik 
+names(df_raw)[1:7]   <- c("Provinsi", "Kab_Kota", paste0("IPM_", 2020:2024))
+names(df_raw)[8:12]  <- paste0("RLS_", 2020:2024)
+names(df_raw)[23:27] <- paste0("AHH_", 2020:2024)
+names(df_raw)[43:47] <- paste0("IPG_", 2020:2024)
+names(df_raw)[48:52] <- paste0("PPP_", 2020:2024)
+
+# Cleaning: Fill Provinsi, Ganti Koma ke Titik, & Konversi Numerik
+df_clean <- df_raw %>%
+  tidyr::fill(Provinsi, .direction = "down") %>%
+  mutate(across(3:ncol(.), ~as.numeric(str_replace_all(as.character(.), ",", ".")))) %>%
+  filter(!is.na(IPM_2024))
+
+
+# Ini penting agar Tahun menjadi satu kolom untuk regresi & grafik tren
+df_panel <- df_clean %>%
+  pivot_longer(
+    cols = matches("2020|2021|2022|2023|2024"),
+    names_to = c(".value", "Tahun"),
+    names_sep = "_"
+  ) %>%
+  mutate(Tahun = as.numeric(Tahun)) %>%
+  select(Provinsi, Kab_Kota, Tahun, IPM, RLS, AHH, IPG, PPP)
+
+# Tampilkan Tabel Interaktif (Seluruh Tahun 2020-2024)
+datatable(
+  df_panel,
+  rownames = FALSE,
+  filter = 'top',
+  options = list(
+    pageLength = 10,
+    scrollX = TRUE,
+    initComplete = JS(
+      "function(settings, json) {",
+      "$(this.api().table().header()).css({'background-color': '#393940', 'color': 'white'});",
+      "}"
+    )
+  ),
+  caption = htmltools::tags$caption(
+    style = "caption-side: top; text-align: center; font-weight: bold; font-size: 16px; color: #2c3e50;",
+    "Dataset Penuh Determinan IPM Indonesia (2020-2024)"
+  )
+) %>%
+  formatRound(columns = c('IPM', 'RLS', 'AHH', 'IPG'), digits = 2) %>%
+  formatCurrency('PPP', currency = "Rp ", interval = 3, mark = ".", digits = 0)
+```
+
+### Korelasi variabel yang digunakan {data-width=1200}
+<div class="column">
+  <div class="col-md-6" style="border-right: 1px solid #ccc; padding-right: 15px;">
+```{r}
+df_matrix <- df_panel %>%
+  filter(Tahun == 2024) %>%
+  select(IPM, RLS, AHH, IPG, PPP) %>%
+  rename(
+    `Pendidikan (RLS)` = RLS,
+    `Kesehatan (AHH)` = AHH,
+    `Gender (IPG)` = IPG,
+    `Ekonomi (PPP)` = PPP
+  )
+
+# Membuat Scatter Plot Matrix
+ggpairs(df_matrix, 
+        title = "Hubungan Linear IPM dengan Variabel Determinan (2024)",
+        upper = list(continuous = wrap("cor", size = 4, color = "black")), # Menampilkan angka korelasi
+        lower = list(continuous = wrap("smooth", alpha = 0.3, size = 0.1, color = "#2980b9")), # Menampilkan tren garis
+        diag = list(continuous = wrap("densityDiag", fill = "#3498db", alpha = 0.5)) # Menampilkan distribusi
+) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(size = 8, face = "bold"),
+    axis.text = element_text(size = 7)
+  )
+```
+  </div>
+  <div class="col-md-6" style="padding-left: 15px; flex-direction: row; font-size: 1.2em; line-height: 1.6; text-align: justify; text-justify: inter-word;">
+<strong style = "font-size: 1.4em;">Interpretasi</strong><br></br>
+Berdasarkan Matriks Korelasi tahun 2024, terlihat bahwa Pendidikan (RLS) dan Kesehatan (AHH) memiliki hubungan linear positif yang paling kuat terhadap Indeks Pembangunan Manusia. Hal ini divalidasi oleh koefisien korelasi yang mendekati angka 1 (misal: 0.89).
+
+Sementara itu, variabel Ekonomi (PPP) menunjukkan sebaran yang lebih luas, mengindikasikan bahwa peningkatan pendapatan per kapita tidak selalu serta-merta meningkatkan kualitas manusia secara instan jika tidak dibarengi dengan akses pendidikan yang merata. Pola hubungan yang linear pada sebagian besar variabel ini memperkuat kelayakan model regresi data panel untuk digunakan pada tahap analisis selanjutnya.
+  </div>
+</div>
+
+Summary of Chow and Hausman {data-orientation=rows}
+=======================================================================
+  
+## Column {.tabset .tabset-fade data-height=520}
+-----------------------------------------------------------------------
+
+### Tabel
+```{r pemilihan_model_lengkap, message=FALSE, warning=FALSE}
+
+# 1. PROTEKSI DATA: Membuat p_data (Pastikan df_panel sudah ada di chunk sebelumnya)
+# Jika Anda menjalankan chunk ini secara terpisah, p_data harus didefinisikan ulang:
+p_data <- pdata.frame(df_panel, index = c("Kab_Kota", "Tahun"))
+
+# 2. EKSEKUSI MODEL
+# Common Effect Model (CEM)
+model_cem <- plm(IPM ~ RLS + AHH + IPG + log(PPP), 
+                 data = p_data, model = "pooling")
+
+# Fixed Effect Model (FEM)
+model_fe <- plm(IPM ~ RLS + AHH + IPG + log(PPP), 
+                data = p_data, model = "within")
+
+# Random Effect Model (REM)
+model_re <- plm(IPM ~ RLS + AHH + IPG + log(PPP), 
+                data = p_data, model = "random")
+
+# 3. UJI CHOW (CEM vs FEM)
+chow_test <- pooltest(model_cem, model_fe)
+p_val_chow <- chow_test$p.value
+
+# 4. UJI HAUSMAN (FEM vs REM)
+hausman_test <- phtest(model_fe, model_re)
+p_val_hausman <- hausman_test$p.value
+
+# 5. RINGKASAN KEPUTUSAN
+final_model <- ifelse(p_val_chow < 0.05, 
+                      ifelse(p_val_hausman < 0.05, "Fixed Effect Model (FEM)", "Random Effect Model (REM)"), 
+                      "Common Effect Model (CEM)")
+```
+
+```{r tabel_interaktif_final, echo=FALSE}
+library(DT)
+
+# Membuat data frame keputusan
+keputusan_df <- data.frame(
+  "Tahapan Uji" = c("1. Uji Chow (CEM vs FEM)", "2. Uji Hausman (FEM vs REM)"),
+  "Parameter" = c("F-Statistik", "Chi-Square"),
+  "Nilai_Statistik" = c(round(chow_test$statistic, 4), round(hausman_test$statistic, 4)),
+  "P_Value" = c(round(chow_test$p.value, 4), round(hausman_test$p.value, 4)),
+  "Keputusan_Model" = c(
+    ifelse(chow_test$p.value < 0.05, "Fixed Effect (FEM)", "Common Effect (CEM)"),
+    ifelse(hausman_test$p.value < 0.05, "Fixed Effect (FEM)", "Random Effect (REM)")
+  )
+)
+
+datatable(
+  keputusan_df,
+  rownames = FALSE,
+  options = list(dom = 't', bSort = FALSE),
+  caption = "Tabel Keputusan Pemilihan Model Regresi Data Panel"
+) %>%
+  formatStyle(
+    'P_Value',
+    color = styleInterval(0.05, c('green', 'red')),
+    fontWeight = 'bold'
+  ) %>%
+  formatStyle(
+    'Keputusan_Model',
+    backgroundColor = styleEqual(c('Fixed Effect (FEM)'), c('#e8f5e9'))
+  )
+```
+
+### Visualisasi Interaktif Hasil Uji Chow
+
+```{r visualisasi_chow}
+# Membuat data untuk Bar Chart RSS
+# RSS (Residual Sum of Squares) yang lebih kecil menunjukkan model yang lebih fit
+rss_comparison <- data.frame(
+  Metode = c("Common Effect (CEM)", "Fixed Effect (FEM)"),
+  RSS = c(sum(residuals(model_cem)^2), sum(residuals(model_fe)^2))
+)
+
+hchart(rss_comparison, "column", hcaes(x = Metode, y = RSS), name = "RSS Value") %>%
+  hc_title(text = "Hasil Uji Chow: Perbandingan Model") %>%
+  hc_subtitle(text = paste0("P-Value: ", round(p_val_chow, 4), " | Keputusan: Pilih ", 
+                            ifelse(p_val_chow < 0.05, "FEM", "CEM"))) %>%
+  hc_colors(c("#e67e22")) %>%
+  hc_add_theme(hc_theme_smpl())
+```
+
+
+### Visualisasi Distribusi Chi-Square (Logika Hausman)
+
+```{r hausman_distribution}
+# 1. Pastikan data sudah siap sebagai pdata.frame
+p_data <- pdata.frame(df_panel, index = c("Kab_Kota", "Tahun"))
+
+# 2. Menjalankan Model (Definisikan model_fe dan model_re di sini)
+model_fe <- plm(IPM ~ RLS + AHH + IPG + log(PPP), 
+                data = p_data, model = "within")
+
+model_re <- plm(IPM ~ RLS + AHH + IPG + log(PPP), 
+                data = p_data, model = "random")
+
+# 3. Jalankan Uji Hausman
+hausman_test <- phtest(model_fe, model_re)
+p_val_hausman <- round(hausman_test$p.value, 4)
+decision <- ifelse(p_val_hausman < 0.05, "Fixed Effect (FEM)", "Random Effect (REM)")
+
+# 4. Persiapan Data Visualisasi (Ekstraksi Koefisien)
+fe_tidy <- tidy(model_fe) %>% mutate(model = "Fixed Effect (FEM)")
+re_tidy <- tidy(model_re) %>% 
+  filter(term != "(Intercept)") %>% 
+  mutate(model = "Random Effect (REM)")
+
+df_coef <- bind_rows(fe_tidy, re_tidy) %>%
+  mutate(
+    low = estimate - (1.96 * std.error),
+    high = estimate + (1.96 * std.error)
+  )
+
+# Menghitung distribusi Chi-Square berdasarkan degree of freedom (df)
+df_hausman <- hausman_test$parameter
+stat_hausman <- hausman_test$statistic
+
+x <- seq(0, stat_hausman * 1.5, length.out = 100)
+y <- dchisq(x, df = df_hausman)
+df_dist <- data.frame(x = x, y = y)
+
+highchart() %>%
+  hc_add_series(df_dist, "area", hcaes(x = x, y = y), name = "Distribusi Chi-Square") %>%
+  hc_add_series(data.frame(x = stat_hausman, y = dchisq(stat_hausman, df_hausman)), 
+                "scatter", hcaes(x = x, y = y), name = "Hausman Statistic", color = "red") %>%
+  hc_title(text = "Posisi Statistik Uji Hausman dalam Distribusi") %>%
+  hc_annotations(list(labels = list(list(point = list(x = stat_hausman, y = 0, xAxis = 0, yAxis = 0), 
+                                         text = paste("Statistik:", round(stat_hausman, 2))))))
+```
+
+
+
+Analisis Deskriptif dan Eksplorasi Spasial IPM {data-orientation=rows}
+=======================================================================
+
+## Column {.tabset .tabset-fade data-height=520}
+-----------------------------------------------------------------------
+
+### Peta Choropleth IPM per Provinsi (2020-2024)
+
+```{r choropleth_ipm_final, message=FALSE, warning=FALSE}
+library(highcharter)
+library(dplyr)
+library(purrr)
+library(htmlwidgets)
+library(jsonlite)
+library(htmltools)
+
+# 1. Agregasi & Sinkronisasi Nama
+df_map_data <- df_panel %>%
+  group_by(Tahun, Provinsi) %>%
+  summarise(value = mean(IPM, na.rm = TRUE), .groups = 'drop') %>%
+  mutate(name = case_when(
+    Provinsi == "DKI Jakarta" ~ "Jakarta Raya",
+    Provinsi == "DI Yogyakarta" ~ "Yogyakarta",
+    Provinsi == "Kep. Bangka Belitung" ~ "Bangka-Belitung",
+    Provinsi == "Kep. Riau" ~ "Kepulauan Riau",
+    TRUE ~ Provinsi
+  )) %>%
+  arrange(Tahun)
+
+# 2. GeoJSON & Data Prep
+map_indo <- download_map_data("countries/id/id-all")
+tahun_list <- sort(unique(df_map_data$Tahun))
+
+# 3. List data per tahun untuk JS
+ds <- lapply(tahun_list, function(t) {
+  df_map_data %>%
+    filter(Tahun == t) %>%
+    select(name, value) %>%
+    list_parse()
+})
+names(ds) <- as.character(tahun_list)
+
+js_data   <- jsonlite::toJSON(ds, auto_unbox = TRUE)
+js_labels <- jsonlite::toJSON(tahun_list, auto_unbox = TRUE)
+
+# 4. Chart Dasar
+hc <- highchart(type = "map") %>%
+  hc_add_series(
+    data = ds[[1]],
+    mapData = map_indo,
+    joinBy = "name",
+    name = paste("IPM", tahun_list[1]),
+    borderWidth = 0.5,
+    borderColor = "#FFFFFF"
+  ) %>%
+  hc_colorAxis(
+    min = 60, max = 85,
+    stops = color_stops(5, viridisLite::viridis(5, direction = -1))
+  ) %>%
+  hc_mapNavigation(enabled = TRUE) %>%
+  hc_chart(height = 500)
+
+# 5. UI + Script (Gunakan % tunggal untuk CSS dan JS Modulo)
+hc <- htmlwidgets::appendContent(
+  hc,
+  
+  # 1. CSS: Pindahkan posisi dari kanan atas ke kiri bawah
+  tags$style(HTML("
+    #ipm-controls {
+      position: absolute; bottom: 20px; left: 16px; z-index: 999;
+      background: rgba(255,255,255,0.9); border-radius: 8px; padding: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-family: 'Segoe UI', sans-serif;
+      min-width: 250px;
+    }
+    #btn-play-ipm { 
+      padding: 6px 12px; cursor: pointer; background: #2c3e50; 
+      color: white; border: none; border-radius: 4px; font-weight: bold;
+    }
+    #slider-ipm { width: 100%; margin-top: 10px; cursor: pointer; }
+    
+    /* Style Tahun Besar: Sekarang di kiri bawah, tepat di atas panel kontrol */
+    .highcharts-year-text {
+      font-size: 80px;
+      font-weight: bold;
+      color: rgba(0, 0, 0, 0.1); 
+      position: absolute;
+      left: 20px;         
+      bottom: 110px;      
+      pointer-events: none; 
+      user-select: none;
+      z-index: 1;        
+    }
+  ")),
+  
+  tags$div(
+  id = "ipm-controls",
+  tags$button(id = "btn-play-ipm", "▶ Play"),
+  tags$input(
+    id = "slider-ipm", type = "range",
+    min = "0", max = as.character(length(tahun_list) - 1),
+    value = "0", step = "1",
+    style = "width:100%; margin-top:10px; cursor:pointer;"
+  ),
+  tags$div(
+    class = "slider-labels",
+    style = "display:flex; justify-content:space-between; font-size:11px; color:#888; margin-top:2px;",
+    tags$span(as.character(min(tahun_list))),
+    tags$span(as.character(max(tahun_list)))
+  )
+),
+
+  tags$script(HTML(sprintf("
+  (function() {
+    var checkExist = setInterval(function() {
+
+      // Cari spesifik chart bertipe 'map', bukan sembarang chart terakhir
+      var mapChart = null;
+      Highcharts.charts.forEach(function(c) {
+        if (c && c.options && c.options.chart && c.options.chart.type === 'map') {
+          mapChart = c;
+        }
+      });
+
+      if (!mapChart) return;
+      clearInterval(checkExist);
+
+      var chart  = mapChart;
+      var data   = %s;
+      var labels = %s;
+
+      // Teks tahun besar di pojok kiri bawah (satu-satunya tampilan tahun)
+      var yearText = document.createElement('div');
+      yearText.className   = 'highcharts-year-text';
+      yearText.innerHTML   = labels[0];
+      chart.container.appendChild(yearText);
+      chart.container.style.position = 'relative';
+      chart.container.style.overflow = 'visible';
+
+      // Pindahkan panel kontrol ke dalam chart container
+      var controls = document.getElementById('ipm-controls');
+      chart.container.appendChild(controls);
+      controls.style.display = 'block';
+
+      var btn     = controls.querySelector('#btn-play-ipm');
+      var slider  = controls.querySelector('#slider-ipm');
+      var current = 0;
+      var timer   = null;
+
+      function update(idx) {
+        idx = Math.max(0, Math.min(parseInt(idx), labels.length - 1));
+        var year = String(labels[idx]);
+        chart.series[0].setData(data[year], true, { duration: 400 });
+        yearText.innerHTML = year;   // hanya update yearText, tidak ada lbl-year
+        slider.value       = idx;
+        current            = idx;
+      }
+
+      // Blok propagasi ke Highcharts
+      controls.addEventListener('mousedown', function(e) { e.stopPropagation(); }, false);
+      controls.addEventListener('mousemove', function(e) { e.stopPropagation(); }, false);
+      controls.addEventListener('mouseup',   function(e) { e.stopPropagation(); }, false);
+
+      // Play / Pause dengan auto loop
+      btn.onclick = function() {
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+          btn.innerHTML            = '▶ Play';
+          btn.style.background     = '#2c3e50';
+        } else {
+          btn.innerHTML            = '⏸ Pause';
+          btn.style.background     = '#e74c3c';
+          timer = setInterval(function() {
+            current = (current + 1) %% labels.length;
+            update(current);
+          }, 1200);
+        }
+      };
+
+      // Slider
+      slider.addEventListener('mousedown', function() {
+        if (timer) { clearInterval(timer); timer = null; btn.innerHTML = '▶ Play'; btn.style.background = '#2c3e50'; }
+      }, false);
+
+      slider.addEventListener('input', function() {
+        update(this.value);
+      }, false);
+
+      slider.addEventListener('change', function() {
+        update(this.value);
+      }, false);
+
+      console.log('Map chart found. Labels:', labels);
+    }, 500);
+  })();
+", js_data, js_labels)))
+)
+
+hc
+```
+
+### Tren IPM: Nasional vs Provinsi {data-height=500}
+
+```{r trend_line_chart}
+library(highcharter)
+library(dplyr)
+
+# 1. Hitung Rata-rata Nasional per Tahun
+df_nasional <- df_panel %>%
+  group_by(Tahun) %>%
+  summarise(IPM = mean(IPM, na.rm = TRUE), .groups = 'drop') %>%
+  mutate(Provinsi = "Rata-rata Nasional")
+
+# 2. Siapkan Data Provinsi (Agregasi dari data Kabupaten/Kota)
+df_prov_trend <- df_panel %>%
+  group_by(Tahun, Provinsi) %>%
+  summarise(IPM = mean(IPM, na.rm = TRUE), .groups = 'drop')
+
+# 3. Visualisasi Tren
+# Di sini kita menampilkan Nasional sebagai garis dasar (baseline)
+# Dan beberapa provinsi besar sebagai perbandingan awal
+highchart() %>%
+  hc_xAxis(categories = unique(df_nasional$Tahun), title = list(text = "Tahun")) %>%
+  hc_yAxis(title = list(text = "Skor IPM")) %>%
+  # Series Nasional (Tebal)
+  hc_add_series(
+    data = df_nasional$IPM,
+    name = "Rata-rata Nasional",
+    type = "line",
+    lineWidth = 4,
+    color = "#2c3e50",
+    marker = list(symbol = "circle", radius = 5)
+  ) %>%
+  # Contoh Menambahkan Beberapa Provinsi secara dinamis
+  # Anda bisa memodifikasi filter ini untuk menampilkan provinsi spesifik
+  hc_add_series(
+    data = (df_prov_trend %>% filter(Provinsi == "DKI Jakarta"))$IPM,
+    name = "DKI Jakarta",
+    type = "line",
+    dashStyle = "ShortDash",
+    color = "#e74c3c"
+  ) %>%
+  hc_add_series(
+    data = (df_prov_trend %>% filter(Provinsi == "Papua"))$IPM,
+    name = "Papua",
+    type = "line",
+    dashStyle = "ShortDash",
+    color = "#27ae60"
+  ) %>%
+  hc_title(text = "Tren Pertumbuhan IPM: Nasional vs Wilayah") %>%
+  hc_subtitle(text = "Perbandingan progres tahun 2020 - 2024") %>%
+  hc_tooltip(shared = TRUE, crosshairs = TRUE) %>%
+  hc_add_theme(hc_theme_smpl()) %>%
+  hc_legend(align = "center", verticalAlign = "bottom", layout = "horizontal")
+```
+
+
+### Sebaran Variabel: Violin + Box Plot {data-height=600}
+
+```{r violin_boxplot}
+library(ggplot2)
+library(plotly)
+library(dplyr)
+library(tidyr)
+
+# 1. Menyiapkan Data
+df_violin <- df_panel %>%
+  select(Tahun, IPM, RLS, AHH, IPG) %>%
+  pivot_longer(cols = -Tahun, names_to = "Variabel", values_to = "Nilai") %>%
+  mutate(Tahun = as.factor(Tahun))
+
+# 2. Membuat Plot
+p <- ggplot(df_violin, aes(x = Tahun, y = Nilai, fill = Variabel)) +
+  # Membuat Violin Plot
+  geom_violin(trim = FALSE, alpha = 0.5, color = NA) +
+  # Menimpa dengan Box Plot tipis di tengahnya
+  geom_boxplot(width = 0.1, color = "black", outlier.size = 0.5, alpha = 0.8) +
+  facet_wrap(~Variabel, scales = "free_y") +
+  theme_minimal() +
+  labs(title = "Distribusi & Kerapatan Variabel IPM",
+       y = "Nilai Indikator",
+       x = "Tahun") +
+  theme(legend.position = "none",
+        strip.text = element_text(face = "bold"))
+
+# 3. Menjadikan Interaktif
+ggplotly(p)
+```
+
+
+Regression Results {data-orientation=rows}
+=======================================================================
+
+## Column {data-height=650}
+-----------------------------------------------------------------------
+
+### Koefisien Regresi Final (Fixed Effect Model)
+<div class="column">
+  <div class="col-md-8" style="border-right: 1px solid #ccc; padding-right: 15px;">
+```{r final_regression_table}
+# 1. Ekstraksi Statistik Model
+s_fe <- summary(model_fe)
+r_sq <- s_fe$r.squared[1]
+f_stat <- s_fe$fstatistic$statistic
+p_fstat <- s_fe$fstatistic$p.value
+
+# 2. Proses Data Frame (Tanpa Intercept)
+fem_results_data <- tidy(model_fe) %>%
+  mutate(
+    Variabel = case_when(
+      term == "RLS" ~ "Pendidikan (RLS)",
+      term == "AHH" ~ "Kesehatan (AHH)",
+      term == "IPG" ~ "Gender (IPG)",
+      term == "log(PPP)" ~ "Ekonomi (log-PPP)",
+      TRUE ~ term
+    ),
+    Signifikansi = case_when(
+      p.value < 0.01 ~ "*** (Sangat Signifikan)",
+      p.value < 0.05 ~ "** (Signifikan)",
+      p.value < 0.1 ~ "* (Cukup Signifikan)",
+      TRUE ~ "Tidak Signifikan"
+    )
+  ) %>%
+  select(
+    Variabel, 
+    Estimasi = estimate, 
+    `Std. Error` = std.error,
+    `t-Statistic` = statistic,
+    `Prob (P-Value)` = p.value,
+    Signifikansi
+  )
+
+# 3. Membuat Output Tabel
+tabel_final_ipm <- datatable(
+  fem_results_data,
+  container = htmltools::withTags(table(
+    tableHeader(names(fem_results_data)),
+    tfoot(
+      tr(
+        th(style = "text-align: left; padding: 12px; background: #f8f9fa; border-top: 2px solid #ddd;", 
+           paste0("Within R-Squared: ", round(r_sq, 4))),
+        th(style = "text-align: left; padding: 12px; background: #f8f9fa; border-top: 2px solid #ddd;", 
+           paste0("F-Stat: ", round(f_stat, 2))),
+        th(colspan = 4, style = "text-align: left; padding: 12px; background: #f8f9fa; border-top: 2px solid #ddd;", 
+           paste0("Prob > F: < 0.001"))
+      )
+    )
+  )),
+  rownames = FALSE,
+  options = list(
+    dom = 't',
+    columnDefs = list(list(className = 'dt-center', targets = 1:5))
+  ),
+  caption = htmltools::tags$caption(
+    style = "caption-side: top; text-align: center; font-weight: bold; font-size: 18px; color: #2c3e50; margin-bottom: 10px;",
+    "Tabel Utama: Hasil Estimasi Parameter Fixed Effect Model (FEM)"
+  )
+) %>%
+  formatRound(columns = 2:5, digits = 4) %>%
+  formatStyle(
+    'Signifikansi',
+    color = styleEqual(
+      c('*** (Sangat Signifikan)', '** (Signifikan)', '* (Cukup Signifikan)'), 
+      c('#1a73e8', '#34a853', '#f2994a')
+    ),
+    fontWeight = 'bold'
+  )
+
+# Tampilkan Tabel
+tabel_final_ipm
+```
+
+  </div>
+```{r, echo=FALSE}
+htmltools::HTML("
+<div class='row'>
+  <div class='col-md-12'>
+    <div style='background-color: #ffffff; 
+                border-radius: 10px; 
+                border-left: 8px solid #2c3e50; 
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+                padding: 25px; 
+                margin: 20px 0;
+                font-family: \"Segoe UI\", Tahoma, Geneva, Verdana, sans-serif;'>
+      
+      <h2 style='color: #2c3e50; margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px;'>
+        <i class='fa fa-line-chart'></i> Analisis & Interpretasi Model
+      </h2>
+
+      <div style='font-size: 1.1em; line-height: 1.7; color: #34495e;'>
+        <p><strong>Berdasarkan hasil analisis data panel periode 2020-2024:</strong></p>
+
+        <div class='row'>
+          <div class='col-md-6'>
+            <h4 style='color: #e67e22;'><i class='fa fa-star'></i> 1. Determinasi Variabel Utama</h4>
+            <ul style='list-style-type: none; padding-left: 10px;'>
+              <li style='margin-bottom: 10px;'>
+                <strong>Akselerator Ekonomi (log-PPP):</strong> Koefisien <code>11.2779</code> menempatkan sektor ini sebagai <em>leading sector</em>. Kenaikan 1% pengeluaran per kapita berkontribusi <strong>0.11 unit</strong> pada skor IPM. Daya beli adalah katalis tercepat kesejahteraan.
+              </li>
+              <li style='margin-bottom: 10px;'>
+                <strong>Fondasi Kesehatan (AHH):</strong> Dampak marginal <code>0.9339</code> menunjukkan tiap tambahan 1 tahun usia harapan hidup menaikkan IPM sebesar <strong>0.93 poin</strong> secara linier dan stabil.
+              </li>
+              <li>
+                <strong>Multiplier Gender (IPG):</strong> Kontribusi <code>0.1487</code> membuktikan inklusivitas gender memberikan <em>added value</em> komplementer terhadap pertumbuhan kualitas manusia.
+              </li>
+            </ul>
+          </div>
+
+          <div class='col-md-6' style='border-left: 1px solid #eee;'>
+            <h4 style='color: #2980b9;'><i class='fa fa-info-circle'></i> 2. Anomali & Kekuatan Model</h4>
+            <p><strong>Sektor Pendidikan (RLS):</strong> Koefisien mendekati nol (<code>-0.0000</code>) menunjukkan adanya <strong>time-lag</strong>. Investasi pendidikan bersifat jangka panjang dan perubahannya memerlukan waktu dekade untuk ter-capture secara signifikan dalam data panel.</p>
+            
+            <div style='background-color: #f8f9fa; padding: 15px; border-radius: 5px; border: 1px solid #ebedef;'>
+              <p style='margin-bottom: 5px;'><strong>Daya Jelaskan (Within R²):</strong> <span style='font-weight:bold; color:#27ae60;'>93.24%</span></p>
+              <p style='margin-bottom: 5px;'><strong>Signifikansi Simultan (F-Stat):</strong> <code>6715.46</code> (p < 0.001)</p>
+              <p style='font-size: 0.9em; font-style: italic; color: #7f8c8d; margin-bottom: 0;'>
+                Model dinyatakan <strong>sangat layak (robust)</strong> sebagai instrumen pengambilan kebijakan publik.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+")
+```
+</div>
